@@ -1,29 +1,19 @@
-%global opt %(test -x %{_bindir}/ocamlopt && echo 1 || echo 0)
-%global debug_package %{nil}
-%if !%opt
-%global __strip /bin/true
-%endif
-
 Name:           ocaml-findlib
-Version:        1.3.3
+Version:        1.7.3
 Release:        7%{?dist}
 Summary:        Objective CAML package manager and build helper
-
-Group:          Development/Libraries
 License:        BSD
+
 URL:            http://projects.camlcity.org/projects/findlib.html
 Source0:        http://download.camlcity.org/download/findlib-%{version}.tar.gz
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-ExcludeArch:    sparc64 s390 s390x
 
-# https://bugzilla.redhat.com/show_bug.cgi?id=1403897
-# https://gitlab.camlcity.org/gerd/lib-findlib/commit/d5838369130057d207a8140c426d0394989951f2
-# Fix a performance problem when ocamlfind links long command lines.
-Patch1:         0001-fix-performance-bug-J-r-me-Vouillon.patch
+# Use ocamlopt -g patch to include debug information.
+Patch1:         findlib-1.4-add-debug.patch
 
-BuildRequires:  ocaml >= 4.00.1
+BuildRequires:  ocaml >= 4.02.0
 BuildRequires:  ocaml-camlp4-devel
-BuildRequires:  ocaml-labltk-devel
+#BuildRequires:  ocaml-labltk-devel
+BuildRequires:  ocaml-ocamlbuild-devel
 BuildRequires:  ocaml-compiler-libs
 BuildRequires:  ocaml-ocamldoc
 BuildRequires:  m4, ncurses-devel
@@ -39,7 +29,6 @@ Objective CAML package manager and build helper.
 
 %package        devel
 Summary:        Development files for %{name}
-Group:          Development/Libraries
 Requires:       %{name} = %{version}-%{release}
 
 
@@ -50,7 +39,7 @@ developing applications that use %{name}.
 
 %prep
 %setup -q -n findlib-%{version}
-%patch1 -p1
+%patch1 -p2
 
 
 %build
@@ -65,38 +54,23 @@ cat src/findlib/ocaml_args.ml
   -mandir %{_mandir} \
   -with-toolbox
 make all
-%if %opt
+%ifarch %{ocaml_native_compiler}
 make opt
 %endif
 rm doc/guide-html/TIMESTAMP
 
 
 %install
-rm -rf $RPM_BUILD_ROOT
 # Grrr destdir grrrr
 mkdir -p $RPM_BUILD_ROOT%{_bindir}
-make install prefix=$RPM_BUILD_ROOT OCAMLFIND_BIN=$RPM_BUILD_ROOT%{_bindir}
-mv $RPM_BUILD_ROOT/$RPM_BUILD_ROOT%{_bindir}/* $RPM_BUILD_ROOT%{_bindir}
-
-%if %opt
-strip $RPM_BUILD_ROOT%{_bindir}/ocamlfind
-%endif
-
-# If ocamlfind is bytecode, don't strip it and prevent prelink from
-# stripping it as well (RHBZ#435559).
-%if !%opt
-mkdir -p $RPM_BUILD_ROOT/etc/prelink.conf.d
-echo '-b /usr/bin/ocamlfind' \
-  > $RPM_BUILD_ROOT/etc/prelink.conf.d/ocaml-ocamlfind.conf
-%endif
-
-
-%clean
-rm -rf $RPM_BUILD_ROOT
+mkdir -p $RPM_BUILD_ROOT%{_mandir}/man{1,5}
+make install \
+     prefix=$RPM_BUILD_ROOT \
+     OCAMLFIND_BIN=%{_bindir} \
+     OCAMLFIND_MAN=%{_mandir}
 
 
 %files
-%defattr(-,root,root,-)
 %doc LICENSE doc/README
 %config(noreplace) %{_sysconfdir}/ocamlfind.conf
 %{_bindir}/*
@@ -105,7 +79,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/ocaml/*/META
 %{_libdir}/ocaml/topfind
 %{_libdir}/ocaml/findlib
-%if %opt
+%ifarch %{ocaml_native_compiler}
 %exclude %{_libdir}/ocaml/findlib/*.a
 %exclude %{_libdir}/ocaml/findlib/*.cmxa
 %endif
@@ -114,25 +88,33 @@ rm -rf $RPM_BUILD_ROOT
 %exclude %{_libdir}/ocaml/findlib/make_wizard
 %exclude %{_libdir}/ocaml/findlib/make_wizard.pattern
 %{_libdir}/ocaml/num-top
-%if !%opt
-%config(noreplace) %{_sysconfdir}/prelink.conf.d/ocaml-ocamlfind.conf
-%endif
 
 
 %files devel
-%defattr(-,root,root,-)
 %doc LICENSE doc/README doc/guide-html
-%if %opt
+%ifarch %{ocaml_native_compiler}
 %{_libdir}/ocaml/findlib/*.a
 %{_libdir}/ocaml/findlib/*.cmxa
 %endif
 %{_libdir}/ocaml/findlib/*.mli
 %{_libdir}/ocaml/findlib/Makefile.config
-%{_libdir}/ocaml/findlib/make_wizard
-%{_libdir}/ocaml/findlib/make_wizard.pattern
 
 
 %changelog
+* Thu Sep 28 2017 Richard W.M. Jones <rjones@redhat.com> - 1.7.3-7
+- Rebuild with ocaml-camlp4.
+  related: rhbz#1447988
+
+* Fri Sep 22 2017 Richard W.M. Jones <rjones@redhat.com> - 1.7.3-6
+- Remove BRs on ocaml-camlp4 and ocaml-labltk.
+- Enable stripping and debuginfo on s390x.
+- Use ocaml_native_compiler macro instead of opt test.
+  related: rhbz#1447988
+
+* Sat Sep 16 2017 Richard W.M. Jones <rjones@redhat.com> - 1.7.3-5
+- Rebase to 1.7.3 (same as Fedora Rawhide).
+  resolves: rhbz#1447988
+
 * Tue Feb 07 2017 Richard W.M. Jones <rjones@redhat.com> - 1.3.3-7
 - Fix a performance problem when ocamlfind links long command lines.
   resolves: rhbz#1403897

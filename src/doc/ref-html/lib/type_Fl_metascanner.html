@@ -9,6 +9,7 @@
 <link title="Findlib" rel="Chapter" href="Findlib.html">
 <link title="Fl_package_base" rel="Chapter" href="Fl_package_base.html">
 <link title="Fl_metascanner" rel="Chapter" href="Fl_metascanner.html">
+<link title="Fl_dynload" rel="Chapter" href="Fl_dynload.html">
 <link title="Topfind" rel="Chapter" href="Topfind.html"><title>The Findlib Library : Fl_metascanner</title>
 </head>
 <body>
@@ -26,8 +27,18 @@
 &nbsp;&nbsp;&nbsp;&nbsp;pkg_children&nbsp;:&nbsp;(string&nbsp;*&nbsp;<span class="constructor">Fl_metascanner</span>.pkg_expr)&nbsp;list;<br>
 &nbsp;&nbsp;}<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;parse&nbsp;:&nbsp;<span class="constructor">Pervasives</span>.in_channel&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Fl_metascanner</span>.pkg_expr<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;parse2&nbsp;:&nbsp;<span class="constructor">Pervasives</span>.in_channel&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Fl_metascanner</span>.pkg_expr<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;parse2_lexing&nbsp;:&nbsp;<span class="constructor">Lexing</span>.lexbuf&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Fl_metascanner</span>.pkg_expr<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;parse_lexing&nbsp;:&nbsp;<span class="constructor">Lexing</span>.lexbuf&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Fl_metascanner</span>.pkg_expr<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;print_def&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Pervasives</span>.out_channel&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Fl_metascanner</span>.pkg_definition&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;print&nbsp;:&nbsp;<span class="constructor">Pervasives</span>.out_channel&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Fl_metascanner</span>.pkg_expr&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;lookup&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;string&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;string&nbsp;list&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Fl_metascanner</span>.pkg_definition&nbsp;list&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;string<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;lookup_2&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;string&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;string&nbsp;list&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Fl_metascanner</span>.pkg_definition&nbsp;list&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;string&nbsp;*&nbsp;<span class="constructor">Fl_metascanner</span>.formal_pred&nbsp;list<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;predicate_exists&nbsp;:&nbsp;string&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Fl_metascanner</span>.pkg_definition&nbsp;list&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;bool<br>
 <span class="keyword">end</span></code></body></html>

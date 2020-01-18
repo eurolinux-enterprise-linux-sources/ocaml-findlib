@@ -1,4 +1,4 @@
-(* $Id: topfind_rd0.p 178 2012-07-09 09:20:31Z gerd $ -*- tuareg -*- *)
+(* $Id$ -*- tuareg -*- *)
 
 (* For Ocaml-3.03 and up, so you can do: #use "topfind" and get a
  * working findlib toploop.

@@ -85,6 +85,96 @@ of questions.
 List of Changes
 ==============================================================================
 
+-  1.7.3: Fix regarding num-top: this library is now also  optional, as num.
+   
+-  1.7.2: Trying to protect against failures when  several package installs are 
+   done in parallel.
+   New subpackage "findlib.top" for the toploop (Jeremie Dimino).
+   The "num" library is now optional.
+   Shell scripts are started via "sh" command when there is no  /bin/sh (ygrek)
+   
+-  1.7.1: added missing file to tarball
+   
+-  1.7.0: New command "ocamlfind printppx" that outputs  how the ppx 
+   preprocessor would be called (Hendrik Tews).
+   Support for the raw_spacetime library that comes with  OCaml 4.04 (Gerd 
+   Stolpmann with help from Mark Shinwell).
+   Require that ocamlc and ocamlc.opt are installed to the  same directory for 
+   emitting the "opt" setting in the generated  config file - same for 
+   ocamlopt.opt, ocamldep.opt, ocamldoc.opt.
+   
+-  1.6.3:Fix: "ocamlfind printconf" respects the  environment variable 
+   OCAMLFIND_CONF (reported by Andre)
+   Build with -opaque (reported by hhugo)
+   Preliminary support for native toplevel so far the toplevel  is implemented 
+   symmetrically to the bytecode case (this is not  correct in vanilla ocaml)
+   New options: ocamlfind query -qe -qo
+   
+-  1.6.2:Uninstalling findlib no longer uninstalls the ocamlbuild library by 
+   accident (Gabriel Scherer, Edwin Török)
+   Adding an "ocamldoc" library, providing the cmi's for ocamldoc plugins 
+   (suggested by Armaël Guéneau)
+   Support for OCaml-4.03: recognize that the new -color option has an argument 
+   (reported by Guillaume Bury)
+   
+-  1.6.1: Just an important doc fix.
+   
+-  1.6.0: Adding support for dynamically loading  packages (François Bobot): 
+   new "plugin" variable, new  Fl_dynload module.
+   New command "ocamlfind lint" for checking META files  (François Bobot).
+   Also support MSYS_NT on Windows. Permit spaces in install  paths (Christophe 
+   Troestler).
+   Allow to query the location of the META file of a package:  "ocamlfind query 
+   -format '%m'" (Gerd Stolpmann).
+   Get the install path for the META file of packages:  "ocamlfind printconf 
+   metapath" (Gerd Stolpmann).
+   
+-  1.5.6: for MSVC build fixing bad filename suffix  (Dmitry Bely).
+   The switch -only-show did not work as described.  (Error report from Bob 
+   Atkey.)
+   Also support mingw64 as system type (Matthieu Dubuget).
+   
+-  1.5.5: fixes a build problem for BSD systens
+   
+-  1.5.4: New ppxopt META variables (Peter Zotov).
+   Support for OCAMLFIND_TOOLCHAIN environment variable (Peter Zotov).  
+   
+-  1.5.3: The installation of "bytes" respects now $prefix and  the configured 
+   destination.
+   New option -pp for "ocamlfind query", to get preprocessor packages.
+   Updated the compatibility Bytes module to support extend, init, mapi,  
+   blit_string (Gabriel Scherer).
+   
+-  1.5.2: support for the query formats "%+a" and "%+A".
+   Fix: the "ppx" property is now also path-expanded when interpreted in a 
+   toploop.
+   Fix: implicit "ppx" is not path-expanded anymore.
+   Fix: Build bytes.cmxs only if natdynlink is enabled (Andy Ray).
+   
+-  1.5.1: includes a file that was missing in 1.5
+   
+-  1.5: Including the "bytes" package that is either a compat package for ocaml 
+   < 4.02 or a fake package for ocaml >= 4.02. The package aims at helping to 
+   support the transition to the new "bytes" type for mutable strings.
+   Also installing findlib.cmxs if OCaml supports it.
+   Allowing to disable camlp4 (in prep for OCaml-4.02).
+   The "ppx" package property can be specified for constructing ppx-type 
+   preprocessors (patches from Peter Zotov).
+   
+-  1.4.1:ocamldoc: The order of -ppopt arguments was changed by ocamlfind, 
+   which is not correct. (Sylvain Le Gall and Jérémie Dimino.)
+   
+-  1.4: Fixed performance bug when many arguments need to be processed (Jérôme 
+   Vouillon).
+   Auto-configuring ocamldoc.opt if it is found (Christopher Zimmermann).
+   New config switch -no-custom to prevent that "ocamlfind" is linked in 
+   custom-runtime mode (bytecode only) (Christopher Zimmermann).
+   The library dbm is no longer part of OCaml, and now optional in findlib 
+   (Ashish Argawal).
+   Support for ocamloptp.
+   New function Topfind.log for controlling the verbosity (Jeremie Dimino).
+   Rewritten Fl_metascanner without camlp4 (patch from Gabriel Scherer)
+   
 -  1.3.3: OCaml-4: using the new #remove_directory directive  if present.
    Better compatibility with the OCaml version from Homebrew.
    

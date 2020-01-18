@@ -1,4 +1,4 @@
-(* $Id: findlib.mli 145 2011-11-29 20:57:20Z gerd $
+(* $Id$
  * ----------------------------------------------------------------------
  *
  *)
@@ -23,6 +23,12 @@ exception Package_loop of string
    * package 
    *)
 
+
+type formal_pred =
+    [ `Pred of string     (** Positive occurence of a formal predicate var *)
+    | `NegPred of string  (** Negative occurence of a formal predicate var *)
+    ]
+  (** A formal predicate as it occurs in a package definition *)
 
 val init : 
       ?env_ocamlpath: string ->
@@ -77,6 +83,7 @@ val init_manually :
       ?ocamlc_command: string ->       (* default: "ocamlc"     *)
       ?ocamlopt_command: string ->     (* default: "ocamlopt"   *)
       ?ocamlcp_command: string ->      (* default: "ocamlcp"    *)
+      ?ocamloptp_command: string ->    (* default: "ocamloptp"   *)
       ?ocamlmklib_command: string ->   (* default: "ocamlmklib" *)
       ?ocamlmktop_command: string ->   (* default: "ocamlmktop" *)
       ?ocamldep_command: string ->     (* default: "ocamldep"   *)
@@ -85,16 +92,22 @@ val init_manually :
       ?ignore_dups_in:string ->        (* default: None *)
       ?stdlib: string ->               (* default: taken from Findlib_config *)
       ?ldconf: string ->
+      ?config: string -> 
       install_dir: string ->
       meta_dir: string ->
       search_path: string list ->
       unit ->
 	unit
   (** This is an alternate way to initialize the library directly. 
-   * Environment variables and configuration files are ignored.
+   * Environment variables and configuration files are ignored. The
+   * parameter [config] just sets the file name reported by the
+   * [config_file] function below.
    *)
 
 
+val config_file : unit -> string
+  (** The location of the configuration file *)
+          
 val default_location : unit -> string
   (** Get the default installation directory for packages *)
 
@@ -106,7 +119,7 @@ val meta_directory : unit -> string
 val search_path : unit -> string list
   (** Get the search path for packages *)
 
-val command : [ `ocamlc | `ocamlopt | `ocamlcp | `ocamlmklib 
+val command : [ `ocamlc | `ocamlopt | `ocamlcp | `ocamloptp | `ocamlmklib 
 	      | `ocamlmktop | `ocamldep | `ocamlbrowser | `ocamldoc
 	      ] -> 
               string
@@ -124,6 +137,9 @@ val package_directory : string -> string
    *
    * Raises [No_such_package] if the package cannot be found.
    *)
+
+val package_meta_file : string -> string
+  (** Get the absolute path of the META file of the given package *)
 
 val ignore_dups_in : unit -> string option
   (** If [Some d], duplicate packages below [d] are ignored, and do not
@@ -145,6 +161,15 @@ val package_property : string list -> string -> string -> string
    *   get the value of the [archive] property of package [p] for multi-
    *   threaded bytecode applications.
    *)
+
+val package_property_2 : string list -> string -> string ->
+                         string * formal_pred list
+  (** [package_property_2 predlist pkg propname]: This returns two values
+      [(v, preds)]. The first one, [v], is computed as in [package_property].
+      The other list, [preds], contains the predicates that actually had to
+      be set or not set in order to select the particular variable definition.
+   *)
+
 
 val package_ancestors : string list -> string -> string list
   (** [package_ancestors predlist pkg:]
@@ -171,7 +196,7 @@ val package_deep_ancestors : string list -> string list -> string list
    * cyclic dependency.
    *)
 
-val resolve_path : ?base:string -> string -> string
+val resolve_path : ?base:string -> ?explicit:bool -> string -> string
   (** Resolves findlib notation in filename paths. The notation 
    * [ +name/path ] can be used to refer to the subdirectory [name]
    * of the standard library directory; the continuation [ /path ] is
@@ -182,6 +207,8 @@ val resolve_path : ?base:string -> string -> string
    * @param base When the function is applied on a relative path, the
    *   [base] path is prepended. Otherwise, the path is returned as
    *   it is.
+   * @param explicit Changes the meaning of [base] so that only paths
+   *   count as relative that include at least one slash.
    *)
 
 val list_packages : ?tab:int -> ?descr:bool -> out_channel -> unit
@@ -189,4 +216,41 @@ val list_packages : ?tab:int -> ?descr:bool -> out_channel -> unit
    *
    * @param tab The tabulator width, by default 20
    * @param descr Whether package descriptions are printed. Default: false
+   *)
+
+(** Managing dynamically loaded packages *)
+
+(** This is a registry of packages that are available in-core. This is both
+    used for toploops and for plugins.
+ *)
+
+type rectype =
+  | Record_core  (** The package is part of the executable core *)
+  | Record_load  (** The package has been dynamically loaded *)
+
+val record_package : rectype -> string -> unit
+  (** Record this package *)
+
+val record_package_predicates : string list -> unit
+  (** Record the predicates to be used for package loading. Certain predicates
+      are automatically filtered out if inappropriate. A call of
+      [record_package_predicates] replaces the set of predicates that was
+      installed beforehand.
+   *)
+
+val recorded_packages : rectype -> string list
+  (** The list of packages recorded with [record_package] *)
+
+val is_recorded_package : string -> bool
+  (** Whether there is a recording for this package *)
+
+val type_of_recorded_package : string -> rectype
+  (** Returns the type, or raises [Not_found] *)
+
+val recorded_predicates : unit -> string list
+  (** The most recent version of the recorded predicate list *)
+
+val reset_recordings : unit -> unit
+  (** Removes all [Record_load] packages from the list of recordings.
+      This forces that the packages are loaded again.
    *)

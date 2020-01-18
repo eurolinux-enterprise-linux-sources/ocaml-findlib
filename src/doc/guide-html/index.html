@@ -37,7 +37,7 @@ NAME="AEN5"
 >Gerd Stolpmann</H3
 ><P
 CLASS="COPYRIGHT"
->Copyright &copy; 1999-2012 Gerd Stolpmann</P
+>Copyright &copy; 1999-2014 Gerd Stolpmann</P
 ><DIV
 ><DIV
 CLASS="ABSTRACT"
@@ -80,7 +80,7 @@ CLASS="FORMALPARA"
 ><P
 ><B
 >Download findlib. </B
->This manual describes version 1.2.8 of the software
+>This manual describes version 1.5 of the software
 package. It can be downloaded at
 <A
 HREF="http://download.camlcity.org/download"
@@ -101,7 +101,7 @@ CLASS="FORMALPARA"
 ><B
 >Quickstart. </B
 >See also the <A
-HREF="/projects/dl/findlib-1.2.8/doc/QUICKSTART"
+HREF="/projects/dl/findlib-1.5/doc/QUICKSTART"
 TARGET="_top"
 >Quickstart page</A
 >
@@ -188,169 +188,184 @@ HREF="x89.html"
 ></DT
 ><DT
 ><A
-HREF="x104.html"
+HREF="x108.html"
 >Querying information stored in META files</A
 ></DT
 ><DT
 ><A
-HREF="x115.html"
+HREF="x119.html"
 >How to compile and link a program that uses a package</A
 ></DT
 ><DT
 ><A
-HREF="x131.html"
+HREF="x135.html"
 >Dependencies</A
 ></DT
 ><DT
 ><A
-HREF="x145.html"
+HREF="x149.html"
 >Linker options</A
 ></DT
 ></DL
 ></DD
 ><DT
 >3. <A
-HREF="c157.html"
+HREF="c161.html"
 >Dependency analysis of packages</A
 ></DT
 ><DD
 ><DL
 ><DT
 ><A
-HREF="c157.html#AEN159"
+HREF="c161.html#AEN163"
 >Querying ancestors</A
 ></DT
 ><DT
 ><A
-HREF="x176.html"
+HREF="x180.html"
 >Querying descendants</A
 ></DT
 ></DL
 ></DD
 ><DT
 >4. <A
-HREF="c188.html"
+HREF="c192.html"
 >A new frontend for ocamlc</A
 ></DT
 ><DD
 ><DL
 ><DT
 ><A
-HREF="c188.html#AEN190"
+HREF="c192.html#AEN194"
 >Compiling and linking</A
 ></DT
 ><DT
 ><A
-HREF="x227.html"
+HREF="x231.html"
 >Toploops and runtime systems</A
 ></DT
 ><DT
 ><A
-HREF="x261.html"
+HREF="x265.html"
 >Multi-threaded applications</A
 ></DT
 ><DT
 ><A
-HREF="x270.html"
+HREF="x274.html"
 >Support for gprof-enabled modules</A
 ></DT
 ></DL
 ></DD
 ><DT
 >5. <A
-HREF="c274.html"
+HREF="c278.html"
 >Complex packages</A
 ></DT
 ><DD
 ><DL
 ><DT
 ><A
-HREF="c274.html#AEN276"
+HREF="c278.html#AEN280"
 >The standard predicates</A
 ></DT
 ><DT
 ><A
-HREF="x307.html"
+HREF="x311.html"
 >Defining additional predicates</A
 ></DT
 ><DT
 ><A
-HREF="x322.html"
+HREF="x326.html"
 >Appending to variables</A
 ></DT
 ><DT
 ><A
-HREF="x334.html"
+HREF="x338.html"
 >Subpackages</A
 ></DT
 ><DT
 ><A
-HREF="x341.html"
+HREF="x345.html"
 >Glue code</A
+></DT
+><DT
+><A
+HREF="x352.html"
+>Plugins</A
+></DT
+><DT
+><A
+HREF="x388.html"
+>Lint</A
 ></DT
 ></DL
 ></DD
 ><DT
 >6. <A
-HREF="c348.html"
+HREF="c395.html"
 >How to create your own packages</A
 ></DT
 ><DD
 ><DL
 ><DT
 ><A
-HREF="c348.html#AEN350"
+HREF="c395.html#AEN397"
 >Installing and removing packages</A
 ></DT
 ><DT
 ><A
-HREF="x355.html"
+HREF="x403.html"
 >Change your Makefile</A
 ></DT
 ><DT
 ><A
-HREF="x372.html"
+HREF="x421.html"
 >Using the Makefile wizard</A
 ></DT
 ></DL
 ></DD
 ><DT
 >7. <A
-HREF="c380.html"
+HREF="c429.html"
 >FAQs</A
 ></DT
 ><DD
 ><DL
 ><DT
 ><A
-HREF="c380.html#AEN382"
+HREF="c429.html#AEN431"
 >Does findlib support the autolink feature of O'Caml 3?</A
 ></DT
 ><DT
 ><A
-HREF="x394.html"
+HREF="x443.html"
 >Why does findlib not automatically include the -custom option if
 linked with C code?</A
 ></DT
 ><DT
 ><A
-HREF="x400.html"
+HREF="x449.html"
 >Does findlib support linking of applications as well as
 packages?</A
 ></DT
 ><DT
 ><A
-HREF="x412.html"
+HREF="x461.html"
 >Does Findlib support camlp4?</A
 ></DT
 ><DT
 ><A
-HREF="x464.html"
+HREF="x513.html"
+>Does Findlib support ppx-style preprocessors?</A
+></DT
+><DT
+><A
+HREF="x524.html"
 >Why do some people install the .cmx files?</A
 ></DT
 ><DT
 ><A
-HREF="x468.html"
+HREF="x528.html"
 >How do I express conflicts?</A
 ></DT
 ></DL

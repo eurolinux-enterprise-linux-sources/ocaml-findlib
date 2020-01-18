@@ -358,6 +358,26 @@ In the preprocessor stage, the archive files are passed as extensions\c
 to the preprocessor (camlp4) call. In the linker stage (-linkpkg), the archive\c
 \&  
 files are linked. In the compiler stage, the archive files are ignored.\c
+.PP
+.ft R
+Note that "archive" should only be used for archive files that are\c
+\&  
+intended to be included in executables or loaded into toploops. For\c
+\&  
+modules loaded at runtime there is the separate variable "plugin".\c
+.RE
+.ft R
+.sp
+.RS "7m"
+.ft R
+\&\h'-3m'\z\(bu\h'3m'\c
+.ft R
+The variable "plugin" specifies the plugin archives of the package.\c
+\&  
+These can be dynamically loaded with the 
+Fl_dynload\c
+\&  
+module. The plugin archives can have ".cmo", ".cma", or ".cmxs" suffix.\c
 .RE
 .ft R
 .sp
@@ -392,6 +412,50 @@ value of "exists_if" is a file; the subpackage is hidden if this\c
 file does not exist. You can also enumerate several files, and the\c
 \&  
 subpackage is hidden if none of the files exist.\c
+.RE
+.ft R
+.sp
+.RS "7m"
+.ft R
+\&\h'-3m'\z\(bu\h'3m'\c
+.ft R
+The variable "ppx" is a command that is added to the compiler invocation\c
+\&  
+via the -ppx option (available since OCaml-4.01). If the command is\c
+\&  
+relative to the current directory (e.g. ./cmd), the command is expected\c
+\&  
+in the package directory. The special forms as defined for "archive"\c
+\&  
+are also available (e.g. @otherpkg/cmd). Additional arguments can be\c
+\&  
+specified on the ocamlfind command line with the -ppxopt option\c
+\&  
+or the "ppxopt" variable.\c
+.RE
+.ft R
+.sp
+.RS "7m"
+.ft R
+\&\h'-3m'\z\(bu\h'3m'\c
+.ft R
+The variable "ppxopt" is a set of options that are added to the ppx\c
+\&  
+rewriter invocation. The contents of the variable consists of one or\c
+\&  
+several whitespace-separated parts. Every part consists of several\c
+\&  
+comma-separated subparts; the first subpart indicates the package\c
+\&  
+that contains the ppx rewriter invocation, the rest contain the options\c
+\&  
+to be appended. If the option is a path relative to the current directory\c
+\&  
+(e.g. ./foo.cma), the path is expanded relative to the package directory.\c
+\&  
+The special forms as defined for "archive" are also available\c
+\&  
+(e.g. @otherpkg/foo.cma).\c
 .RE
 .ft R
 .PP
@@ -507,6 +571,18 @@ preprocessor options.\c
 The "syntax" predicate means that the -syntax option is present on the\c
 \&  
 command line.\c
+.RE
+.ft R
+.sp
+.RS "7m"
+.ft R
+\&\h'-3m'\z\(bu\h'3m'\c
+.ft R
+Legacy: The "plugin" predicate could be used in some versions of findlib\c
+\&  
+to select cmxs archives instead of cmxa archives. This use is still possible\c
+\&  
+but discouraged.\c
 .RE
 .ft R
 .PP

@@ -17,7 +17,7 @@ TITLE="Looking up package directories"
 HREF="x81.html"><LINK
 REL="NEXT"
 TITLE="Querying information stored in META files"
-HREF="x104.html"></HEAD
+HREF="x108.html"></HEAD
 ><BODY
 CLASS="SECT1"
 BGCOLOR="#FFFFFF"
@@ -59,7 +59,7 @@ WIDTH="10%"
 ALIGN="right"
 VALIGN="bottom"
 ><A
-HREF="x104.html"
+HREF="x108.html"
 ACCESSKEY="N"
 >Next</A
 ></TD
@@ -142,6 +142,20 @@ CLASS="PROGRAMLISTING"
 ><P
 >The correct value for the "archive" variable is selected upon the
 given set of predicates.</P
+><P
+>Many packages can also be loaded at runtime with the
+<TT
+CLASS="LITERAL"
+>Fl_dynload</TT
+> module. In this case, though, the
+variable "plugin" is used instead of "archive", e.g.</P
+><PRE
+CLASS="PROGRAMLISTING"
+>plugin(byte) = "p.cma"
+plugin(native) = "p.cmxs"</PRE
+><P
+>(You can create p.cmxs from p.cmxa with 
+"ocamlopt -shared -linkall -o p.cmxs p.cmxa".) Note that "plugin" is entirely optional.</P
 ></DIV
 ><H3
 CLASS="FOOTNOTES"
@@ -208,7 +222,7 @@ WIDTH="33%"
 ALIGN="right"
 VALIGN="top"
 ><A
-HREF="x104.html"
+HREF="x108.html"
 ACCESSKEY="N"
 >Next</A
 ></TD

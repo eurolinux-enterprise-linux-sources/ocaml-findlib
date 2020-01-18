@@ -1,7 +1,9 @@
-(* $Id: findlib.ml 155 2012-05-06 19:18:35Z gerd $
+(* $Id$
  * ----------------------------------------------------------------------
  *
  *)
+
+module StrSet = Set.Make(String)
 
 exception No_such_package 
   = Fl_package_base.No_such_package
@@ -10,10 +12,14 @@ exception No_such_package
 exception Package_loop 
   = Fl_package_base.Package_loop
 
-
+type formal_pred =
+    [ `Pred of string
+    | `NegPred of string
+    ]
 
 let init_called = ref false ;;
 
+let conf_config_file = ref "";;
 let conf_default_location = ref "";;
 let conf_meta_directory = ref "";;
 let conf_search_path = ref [];;
@@ -25,6 +31,7 @@ let conf_ignore_dups_in = ref (None : string option);;
 let ocamlc_default = "ocamlc";;
 let ocamlopt_default = "ocamlopt";;
 let ocamlcp_default = "ocamlcp";;
+let ocamloptp_default = "ocamloptp";;
 let ocamlmklib_default = "ocamlmklib";;
 let ocamlmktop_default = "ocamlmktop";;
 let ocamldep_default = "ocamldep";;
@@ -36,6 +43,7 @@ let init_manually
       ?(ocamlc_command = ocamlc_default)
       ?(ocamlopt_command = ocamlopt_default)
       ?(ocamlcp_command = ocamlcp_default)
+      ?(ocamloptp_command = ocamloptp_default)
       ?(ocamlmklib_command = ocamlmklib_default)
       ?(ocamlmktop_command = ocamlmktop_default)
       ?(ocamldep_command = ocamldep_default)
@@ -44,18 +52,21 @@ let init_manually
       ?ignore_dups_in
       ?(stdlib = Findlib_config.ocaml_stdlib)
       ?(ldconf = Findlib_config.ocaml_ldconf)
+      ?(config = Findlib_config.config_file)
       ~install_dir
       ~meta_dir
       ~search_path () =
   conf_command := [ `ocamlc,     ocamlc_command;
 		    `ocamlopt,   ocamlopt_command;
 		    `ocamlcp,    ocamlcp_command;
+		    `ocamloptp,  ocamloptp_command;
 		    `ocamlmklib, ocamlmklib_command;
 		    `ocamlmktop, ocamlmktop_command;
 		    `ocamldep,   ocamldep_command;
 		    `ocamlbrowser, ocamlbrowser_command;
 		    `ocamldoc,   ocamldoc_command;
 		  ];
+  conf_config_file := config;
   conf_search_path := search_path;
   conf_default_location := install_dir;
   conf_meta_directory := meta_dir;
@@ -90,6 +101,12 @@ let command_names cmd_spec =
 	[]
 ;;
 
+let auto_config_file() =
+  let p =
+    ( try Sys.getenv "OCAMLFIND_CONF" with Not_found -> "") in
+  if p = "" then Findlib_config.config_file else p
+                                                   
+  
 let init
       ?env_ocamlpath ?env_ocamlfind_destdir ?env_ocamlfind_metadir
       ?env_ocamlfind_commands ?env_ocamlfind_ignore_dups_in
@@ -99,10 +116,7 @@ let init
   let config_file =
     match config with
 	Some f -> f
-      | None ->
-	  let p =
-	    ( try Sys.getenv "OCAMLFIND_CONF" with Not_found -> "") in
-	  if p = "" then Findlib_config.config_file else p
+      | None -> auto_config_file()
   in
 
   let configd_file =
@@ -133,10 +147,10 @@ let init
 
   let config_preds =
     match toolchain with
-      | None -> []
+      | None -> (try [Sys.getenv "OCAMLFIND_TOOLCHAIN"] with Not_found -> [])
       | Some p -> [p] in
 
-  let sys_ocamlc, sys_ocamlopt, sys_ocamlcp, sys_ocamlmklib,
+  let sys_ocamlc, sys_ocamlopt, sys_ocamlcp, sys_ocamloptp, sys_ocamlmklib,
       sys_ocamlmktop, sys_ocamldep, sys_ocamlbrowser, sys_ocamldoc,
       sys_search_path, sys_destdir, sys_metadir, sys_stdlib, sys_ldconf = 
     (
@@ -173,6 +187,7 @@ let init
 	  ( (lookup "ocamlc" ocamlc_default),
 	    (lookup "ocamlopt" ocamlopt_default),
 	    (lookup "ocamlcp" ocamlcp_default),
+	    (lookup "ocamloptp" ocamloptp_default),
 	    (lookup "ocamlmklib" ocamlmklib_default),
 	    (lookup "ocamlmktop" ocamlmktop_default),
 	    (lookup "ocamldep" ocamldep_default),
@@ -190,7 +205,8 @@ let init
         config_tuple
       )
       else
-	( ocamlc_default, ocamlopt_default, ocamlcp_default, ocamlmklib_default,
+	( ocamlc_default, ocamlopt_default, ocamlcp_default, ocamloptp_default,
+	  ocamlmklib_default,
 	  ocamlmktop_default, ocamldep_default, ocamlbrowser_default,
 	  ocamldoc_default,
 	  [],
@@ -251,12 +267,13 @@ let init
 	  try Some(Sys.getenv "OCAMLFIND_IGNORE_DUPS_IN") 
 	  with Not_found -> None in
 
-  let ocamlc, ocamlopt, ocamlcp, ocamlmklib, ocamlmktop,
+  let ocamlc, ocamlopt, ocamlcp, ocamloptp, ocamlmklib, ocamlmktop,
       ocamldep, ocamlbrowser, ocamldoc,
       search_path, destdir, metadir, stdlib, ldconf =
     (try List.assoc "ocamlc"     env_commands with Not_found -> sys_ocamlc),
     (try List.assoc "ocamlopt"   env_commands with Not_found -> sys_ocamlopt),
     (try List.assoc "ocamlcp"    env_commands with Not_found -> sys_ocamlcp),
+    (try List.assoc "ocamloptp"  env_commands with Not_found -> sys_ocamloptp),
     (try List.assoc "ocamlmklib" env_commands with Not_found -> sys_ocamlmklib),
     (try List.assoc "ocamlmktop" env_commands with Not_found -> sys_ocamlmktop),
     (try List.assoc "ocamldep"   env_commands with Not_found -> sys_ocamldep),
@@ -273,6 +290,7 @@ let init
     ~ocamlc_command: ocamlc
     ~ocamlopt_command: ocamlopt
     ~ocamlcp_command: ocamlcp
+    ~ocamloptp_command: ocamloptp
     ~ocamlmklib_command: ocamlmklib
     ~ocamlmktop_command: ocamlmktop
     ~ocamldep_command: ocamldep
@@ -281,6 +299,7 @@ let init
     ?ignore_dups_in
     ~stdlib: stdlib
     ~ldconf: ldconf
+    ~config: config_file
     ~install_dir: destdir
     ~meta_dir: metadir
     ~search_path: search_path
@@ -291,6 +310,10 @@ let init
 let lazy_init() =
   if not !init_called then init()
 
+let config_file() =
+  lazy_init();
+  !conf_config_file;;
+                               
 
 let default_location() = 
   lazy_init();
@@ -335,6 +358,19 @@ let package_directory pkg =
 ;;
 
 
+let package_meta_file pkg =
+  lazy_init();
+  (Fl_package_base.query pkg).Fl_package_base.package_meta
+;;
+
+
+let package_property_2 predlist pkg propname =
+  lazy_init();
+  let l = Fl_package_base.query pkg in
+  Fl_metascanner.lookup_2 propname predlist l.Fl_package_base.package_defs
+;;
+
+
 let package_property predlist pkg propname =
   lazy_init();
   let l = Fl_package_base.query pkg in
@@ -354,7 +390,7 @@ let package_deep_ancestors predlist pkglist =
 ;;
 
 
-let resolve_path ?base p =
+let resolve_path ?base ?(explicit=false) p =
   lazy_init();
   if p = "" then "" else (
     match p.[0] with
@@ -380,7 +416,9 @@ let resolve_path ?base p =
 	  ( match base with
 		None -> p
 	      | Some b ->
-		  if Filename.is_relative p then
+		  if Filename.is_relative p &&
+                       (not explicit || not (Filename.is_implicit p))
+                  then
 		    Filename.concat b p
 		  else
 		    p
@@ -418,3 +456,58 @@ let list_packages ?(tab = 20) ?(descr = false) ch =
     )
     packages_sorted
 ;;
+
+
+type rectype =
+  | Record_core
+  | Record_load
+
+let rec_core = ref StrSet.empty
+let rec_load = ref StrSet.empty
+let rec_preds = ref []
+
+let record_package (rt:rectype) (p:string) =
+  match rt with
+    | Record_core ->
+        rec_core := StrSet.add p !rec_core
+    | Record_load ->
+        rec_load := StrSet.add p !rec_load
+
+let recorded_packages rt =
+  match rt with
+    | Record_core ->
+        StrSet.elements !rec_core
+    | Record_load ->
+        StrSet.elements (StrSet.diff !rec_load !rec_core)
+
+let reset_recordings() =
+  rec_load := StrSet.empty
+
+let type_of_recorded_package p =
+  if StrSet.mem p !rec_core then
+    Record_core
+  else
+    if StrSet.mem p !rec_load then
+      Record_load
+    else
+      raise Not_found
+
+let is_recorded_package p =
+  try ignore(type_of_recorded_package p); true with Not_found -> false
+
+
+let rm_preds =
+  [ "create_toploop"; "toploop"; "executable"; "plugin"; "autolink";
+    "preprocessor"; "syntax" ]
+
+let rm_preds_set =
+  List.fold_right StrSet.add rm_preds StrSet.empty
+
+let record_package_predicates preds =
+  let preds' =
+    List.filter (fun p -> not(StrSet.mem p rm_preds_set)) preds in
+  rec_preds := preds'
+
+let recorded_predicates() =
+  !rec_preds
+

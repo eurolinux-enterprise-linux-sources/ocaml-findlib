@@ -236,6 +236,19 @@ In the preprocessor stage, the archive files are passed as extensions
 to the preprocessor (camlp4) call. In the linker stage (-linkpkg), the archive
 files are linked. In the compiler stage, the archive files are ignored.
 </para>
+
+<para>
+Note that "archive" should only be used for archive files that are
+intended to be included in executables or loaded into toploops. For
+modules loaded at runtime there is the separate variable "plugin".
+</listitem>
+
+<listitem> 
+<para> 
+The variable "plugin" specifies the plugin archives of the package.
+These can be dynamically loaded with the <literal>Fl_dynload</literal>
+module. The plugin archives can have ".cmo", ".cma", or ".cmxs" suffix.
+</para>
 </listitem>
 
 <listitem> 
@@ -261,6 +274,31 @@ subpackage is hidden if none of the files exist.
 </para>
 </listitem>
 
+<listitem>
+<para>
+The variable "ppx" is a command that is added to the compiler invocation
+via the -ppx option (available since OCaml-4.01). If the command is
+relative to the current directory (e.g. ./cmd), the command is expected
+in the package directory. The special forms as defined for "archive"
+are also available (e.g. @otherpkg/cmd). Additional arguments can be
+specified on the ocamlfind command line with the -ppxopt option
+or the "ppxopt" variable.
+</para>
+</listitem>
+
+<listitem>
+<para>
+The variable "ppxopt" is a set of options that are added to the ppx
+rewriter invocation. The contents of the variable consists of one or
+several whitespace-separated parts. Every part consists of several
+comma-separated subparts; the first subpart indicates the package
+that contains the ppx rewriter invocation, the rest contain the options
+to be appended. If the option is a path relative to the current directory
+(e.g. ./foo.cma), the path is expanded relative to the package directory.
+The special forms as defined for "archive" are also available
+(e.g. @otherpkg/foo.cma).
+</para>
+</listitem>
 
 </itemizedlist>
 
@@ -349,6 +387,14 @@ preprocessor options.</para>
 <para>
 The "syntax" predicate means that the -syntax option is present on the
 command line.</para>
+</listitem>
+
+<listitem>
+<para>
+Legacy: The "plugin" predicate could be used in some versions of findlib
+to select cmxs archives instead of cmxa archives. This use is still possible
+but discouraged.
+</para>
 </listitem>
 
 </itemizedlist>

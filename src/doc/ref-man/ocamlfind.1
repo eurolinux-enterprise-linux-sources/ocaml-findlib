@@ -83,7 +83,20 @@ package_name\c
 .ft B
 \&
 .br
+\&\ \ \ or:\ ocamlfind\ lint\ \c
+.ft I
+META\c
+.ft B
+\&
+.br
 \&\ \ \ or:\ ocamlfind\ list\ [-describe]\c
+\&
+.br
+\&\ \ \ or:\ ocamlfind\ printppx\ [-help\ |\ other\ options]\ \c
+.ft I
+package_name\c
+.ft B
+\&\ ...\c
 \&
 .br
 \&\ \ \ or:\ ocamlfind\ printconf\ [\ variable\ ]\c
@@ -176,10 +189,16 @@ s\c
 \&\ |\c
 \&
 .br
+\&\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -pp\ |\c
+\&
+.br
 \&\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -descendants\ |\ -d\ |\c
 \&
 .br
-\&\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -recursive\ \ |\ -r\ ]\ \c
+\&\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -recursive\ \ |\ -r\c
+\&
+.br
+\&\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -qe\ |\ -qo]\ \c
 .ft I
 package\c
 .ft B
@@ -333,7 +352,7 @@ linker backend are printed.\c
 .RS "7m"
 .ft R
 .ft R
-Same as -format "%a", i.e. archive file names are printed.\c
+Same as -format "%+a", i.e. archive file names are printed.\c
 .RE
 .ft R
 .sp
@@ -452,6 +471,51 @@ Instead of the ancestors the descendants of the\c
 \&.\c
 .RE
 .ft R
+.sp
+.RS "2m"
+.ft R
+-pp\c
+.RE
+.ft R
+.sp
+.RS "7m"
+.ft R
+.ft R
+Query preprocessor packages (camlp4 syntax extensions). Normally\c
+\&  
+it is not needed to set -predicates, except you need the archives (then add\c
+\&  
+-predicates byte). This option implies 
+-recursive\c
+\&.\c
+.RE
+.ft R
+.sp
+.RS "2m"
+.ft R
+-qe\c
+.RE
+.ft R
+.sp
+.RS "7m"
+.ft R
+.ft R
+Do not print most errors to stderr, just set the exit code\c
+.RE
+.ft R
+.sp
+.RS "2m"
+.ft R
+-qo\c
+.RE
+.ft R
+.sp
+.RS "7m"
+.ft R
+.ft R
+Do not print the regular output.\c
+.RE
+.ft R
 .PP
 .ft R
 .SS "Placeholders meaningful in the -format option"
@@ -498,6 +562,19 @@ Replaced by the package directory\c
 .sp
 .RS "2m"
 .ft R
+%m\c
+.RE
+.ft R
+.sp
+.RS "7m"
+.ft R
+.ft R
+Replaced by the path to the META file (new since findlib-1.6)\c
+.RE
+.ft R
+.sp
+.RS "2m"
+.ft R
 %D\c
 .RE
 .ft R
@@ -539,6 +616,21 @@ Replaced by the archive filename. If there is more\c
 .sp
 .RS "2m"
 .ft R
+%+a\c
+.RE
+.ft R
+.sp
+.RS "7m"
+.ft R
+.ft R
+Like %a, but the filenames are converted to absolute\c
+\&  
+\& paths ("+" and "@" notations are resolved)\c
+.RE
+.ft R
+.sp
+.RS "2m"
+.ft R
 %A\c
 .RE
 .ft R
@@ -547,6 +639,21 @@ Replaced by the archive filename. If there is more\c
 .ft R
 .ft R
 Replaced by the list of archive filenames.\c
+.RE
+.ft R
+.sp
+.RS "2m"
+.ft R
+%+A\c
+.RE
+.ft R
+.sp
+.RS "7m"
+.ft R
+.ft R
+Like %A, but the filenames are converted to absolute\c
+\&  
+\& paths ("+" and "@" notations are resolved)\c
 .RE
 .ft R
 .sp
@@ -646,6 +753,17 @@ camlp4-arg\c
 \&\ |\c
 \&
 .br
+\&\ \ \ \ \ \ \ \ \ \ \ \ -ppxopt\ \c
+.ft I
+package\c
+.ft B
+,\c
+.ft I
+arg\c
+.ft B
+\&\ |\c
+\&
+.br
 \&\ \ \ \ \ \ \ \ \ \ \ \ -dllpath-pkg\ \c
 .ft I
 package-name-list\c
@@ -668,6 +786,9 @@ arg\c
 arg...\c
 .ft B
 \&\ |\c
+\&
+.br
+\&\ \ \ \ \ \ \ \ \ \ \ \ -only-show\ |\c
 \&
 .br
 \&\ \ \ \ \ \ \ \ \ \ \ \ \c
@@ -951,6 +1072,23 @@ arg...\c
 .sp
 .RS "2m"
 .ft R
+-only-show\c
+.RE
+.ft R
+.sp
+.RS "7m"
+.ft R
+.ft R
+Only prints the constructed command (ocamlc/ocamlopt) to\c
+\&  
+\& stdout, but does not execute the command. (This is for the unlikely event\c
+\&  
+\& that you need a wrapper around ocamlfind.)\c
+.RE
+.ft R
+.sp
+.RS "2m"
+.ft R
 -verbose\c
 .RE
 .ft R
@@ -1088,6 +1226,40 @@ camlp4-arg\c
 .ft R
 .ft R
 This argument is passed to the camlp4 call.\c
+\&  
+\&  
+.RE
+.ft R
+.sp
+.RS "2m"
+.ft R
+-ppxopt 
+.ft I
+package\c
+.ft R
+,\c
+.ft I
+arg\c
+.ft R
+.RE
+.ft R
+.sp
+.RS "7m"
+.ft R
+.ft R
+Add 
+.ft I
+arg\c
+.ft R
+\& to the ppx\c
+\&  
+\& preprocessor invocation specified via the "ppx" property in\c
+\&  
+\& the META file of 
+.ft I
+package\c
+.ft R
+\&.\c
 \&  
 \&  
 .RE
@@ -2333,6 +2505,111 @@ ocamlfind\ list\ [-describe]\c
 This command lists all packages in the search path. The option -describe\c
 \&  
 outputs the package descriptions, too.\c
+.SH "THE 'printppx' SUBCOMMAND"
+.ft R
+.SS "Synopsis"
+.ft R
+.ft R
+.ft B
+.nf
+ocamlfind\ printppx\c
+\&
+.br
+\&\ \ \ \ \ \ \ \ \ \ [\ -predicates\ \c
+.ft I
+pred-name-list\c
+.ft B
+\&\ ]\c
+\&
+.br
+\&\ \ \ \ \ \ \ \ \ \ [\ -ppxopt\ \c
+.ft I
+package\c
+.ft B
+,\c
+.ft I
+arg\c
+.ft B
+\&\ ]\c
+\&
+.br
+\&\ \ \ \ \ \ \ \ \ \ \c
+.ft I
+package\c
+.ft B
+\&\ ...\c
+.ft R
+.fi
+.SS "Description"
+.ft R
+.ft R
+This command prints the ppx preprocessor options as they would\c
+\&  
+occur in an OCaml compiler invocation for the packages listed in\c
+\&  
+the command. The output includes one "-ppx" option for each\c
+\&  
+preprocessor. The possible options have the same meaning as for\c
+\&  
+"ocamlfind ocamlc". The option "-predicates" adds assumed\c
+\&  
+predicates and\c
+\&  
+"-ppxopt 
+.ft I
+package\c
+.ft R
+,\c
+.ft I
+arg\c
+.ft R
+"\c
+\&  
+adds "\c
+.ft I
+arg\c
+.ft R
+" to the ppx invocation of\c
+\&  
+package 
+.ft I
+package\c
+.ft R
+\&.\c
+.PP
+.ft R
+The output of "ocamlfind printppx" will contain quotes\c
+\&  
+"\c
+"\c
+" for ppx commands that contain\c
+\&  
+space-separated arguments. In this case 
+$(ocamlfind\c
+\&  
+printppx ...)\c
+\& won't work as naively expected, because\c
+\&  
+many shells (including bash and dash) perform field splitting on\c
+\&  
+the result of command substitutions without honoring quotes.\c
+.SH "THE 'lint' SUBCOMMAND"
+.ft R
+.SS "Synopsis"
+.ft R
+.ft R
+.ft B
+.nf
+ocamlfind\ lint\ \c
+.ft I
+file\c
+.ft B
+.ft R
+.fi
+.SS "Description"
+.ft R
+.ft R
+Checks the META file, and reports possible problems.\c
 .SH "THE 'printconf' SUBCOMMAND"
 .ft R
 .SS "Synopsis"
@@ -2340,7 +2617,7 @@ outputs the package descriptions, too.\c
 .ft R
 .ft B
 .nf
-ocamlfind\ printconf\ [\ conf\ |\ path\ |\ destdir\ |\ metadir\ |\ stdlib\ |\ ldconf\ ]\c
+ocamlfind\ printconf\ [\ conf\ |\ path\ |\ destdir\ |\ metadir\ |\ metapath\ |\ stdlib\ |\ ldconf\ ]\c
 .ft R
 .fi
 .SS "Description"
@@ -2416,6 +2693,25 @@ metadir\c
 Prints the location where META files are installed and\c
 \&  
 \& removed (if the alternative layout is used).\c
+.RE
+.ft R
+.sp
+.RS "2m"
+.ft R
+metapath\c
+.RE
+.ft R
+.sp
+.RS "7m"
+.ft R
+.ft R
+Prints the path where the META file is installed for\c
+\&  
+a fictive package. The name of the package is marked with '%s' in the\c
+\&  
+path. For instance, this command could output "/some/path/%s/META" or\c
+\&  
+"/some/path/META.%s", depending on the layout.\c
 .RE
 .ft R
 .sp

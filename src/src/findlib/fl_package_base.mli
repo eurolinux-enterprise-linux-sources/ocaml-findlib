@@ -1,4 +1,4 @@
-(* $Id: fl_package_base.mli 141 2011-04-06 20:27:53Z gerd $
+(* $Id$
  * ----------------------------------------------------------------------
  *
  *)
@@ -13,6 +13,8 @@ type package =
 	 *)
       package_dir : string;
         (** The directory where to lookup package files *)
+      package_meta : string;
+        (** The path to the META file *)
       package_defs : Fl_metascanner.pkg_definition list;
         (** The definitions in the META file *)
       package_priv : package_priv;

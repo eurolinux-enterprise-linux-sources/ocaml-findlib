@@ -1,4 +1,4 @@
-(* $Id: topfind.mli 49 2003-12-30 09:48:02Z gerd $
+(* $Id$
  * ----------------------------------------------------------------------
  *
  *)
@@ -118,3 +118,5 @@ val reset : unit -> unit
 val announce : unit -> unit
   (** Output the startup message *)
 
+val log : (string -> unit) ref
+  (** Function used to log messages from this module. *)

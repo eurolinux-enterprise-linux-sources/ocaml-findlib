@@ -1,4 +1,4 @@
-(* $Id: fl_args.ml 156 2012-05-06 20:33:52Z gerd $ *)
+(* $Id$ *)
 
 (* Rewrite a list of arguments args (from Sys.args) so that contracted
    options like -L<arg> are transformed to -L <arg>, and become parseable
@@ -75,7 +75,9 @@ let rewrite_contracted_args spec contracted_opts args =
           arg1 :: arg2 :: rewrite args_rest
       | arg :: args_rest ->
           ( try
-              expand arg contracted_opts @ rewrite args_rest
+              let args1 = expand arg contracted_opts in
+              let args2 = rewrite args_rest in
+	      args1 @ args2
             with
               | Not_found ->
                   arg :: rewrite args_rest

@@ -1,4 +1,4 @@
-(* $Id: extract_args.ml 163 2012-05-07 13:03:54Z gerd $ *)
+(* $Id$ *)
 
 (* Runs ocamlc -help and extract the command-line signature *)
 
@@ -46,7 +46,7 @@ let get_help cmd =
 let switch1_re = Str.regexp "[ \t]*\\(-[-a-zA-Z0-9_,]+\\)[ \t]?\\(.*\\)$";;
 let switch2_re = Str.regexp "[ \t]*\\(-\\)[ \t]+\\(.*\\)$";;
 
-let argument_re = Str.regexp "[ \t]*[<[]";;
+let argument_re = Str.regexp "[ \t]*[<[{]";;
 
 let rec extract_signature lines =
   match lines with

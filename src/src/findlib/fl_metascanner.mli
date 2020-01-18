@@ -1,4 +1,4 @@
-(* $Id: fl_metascanner.mli 155 2012-05-06 19:18:35Z gerd $
+(* $Id$
  * ----------------------------------------------------------------------
  *
  *)
@@ -55,6 +55,16 @@ val parse : in_channel -> pkg_expr
    * raised on syntax errors. The string explains the error.
    *)
 
+val parse2 : in_channel -> pkg_expr
+
+val parse2_lexing : Lexing.lexbuf -> pkg_expr
+val parse_lexing : Lexing.lexbuf -> pkg_expr
+
+
+val print_def : out_channel -> pkg_definition -> unit
+  (** [print_def ch def]:
+    * Outputs the definition to a channel.
+   *)
 
 val print : out_channel -> pkg_expr -> unit
   (** [print ch expr]:
@@ -80,6 +90,13 @@ val lookup :
    *
    * When step (A) does not find any matching definition, the exception
    * [Not_found] is raised.
+   *)
+
+
+val lookup_2 : 
+    string -> string list -> pkg_definition list -> string * formal_pred list
+  (** Like [lookup], but also returns the list of predicates that had to
+      be considered to select the particular variable definition.
    *)
 
 

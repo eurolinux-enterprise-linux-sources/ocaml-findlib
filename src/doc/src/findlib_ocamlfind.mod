@@ -26,7 +26,9 @@
    or: <link linkend="ocamlfind.ocamlbrowser">ocamlfind ocamlbrowser [-help | other options]</link>
    or: <link linkend="ocamlfind.install">ocamlfind install [-help | other options] <replaceable>package_name</replaceable> <replaceable>file</replaceable> ...</link>
    or: <link linkend="ocamlfind.remove">ocamlfind remove [-help | other options] <replaceable>package_name</replaceable></link>
+   or: <link linkend="ocamlfind.list">ocamlfind lint <replaceable>META</replaceable></link>
    or: <link linkend="ocamlfind.list">ocamlfind list [-describe]</link>
+   or: <link linkend="ocamlfind.printppx">ocamlfind printppx [-help | other options] <replaceable>package_name</replaceable> ...</link>
    or: <link linkend="ocamlfind.printconf">ocamlfind printconf [ variable ]</link>
    or: <link linkend="ocamlfind.pkgcmd">ocamlfind <replaceable>package</replaceable>/<replaceable>command</replaceable> <replaceable>arg</replaceable> ...</link>
 
@@ -57,8 +59,10 @@ ocamlfind query [ -predicates <replaceable>p</replaceable>  |
                   -prefix <replaceable>p</replaceable> |
                   -separator <replaceable>s</replaceable> | 
                   -suffix <replaceable>s</replaceable> |
+                  -pp |
                   -descendants | -d |
-                  -recursive  | -r ] <replaceable>package</replaceable> ...
+                  -recursive  | -r
+                  -qe | -qo] <replaceable>package</replaceable> ...
 </programlisting>
 </refsect2>
 
@@ -130,7 +134,7 @@ linker backend are printed.
 </varlistentry>
 <varlistentry>
 <term>-a-format</term>
-<listitem><para>Same as -format "%a", i.e. archive file names are printed.
+<listitem><para>Same as -format "%+a", i.e. archive file names are printed.
 </para></listitem>
 </varlistentry>
 <varlistentry>
@@ -175,6 +179,24 @@ linker backend are printed.
   given packages are queried. This option implies <literal>-recursive</literal>.
 </para></listitem>
 </varlistentry>
+<varlistentry>
+<term>-pp</term>
+<listitem><para>Query preprocessor packages (camlp4 syntax extensions). Normally
+it is not needed to set -predicates, except you need the archives (then add
+-predicates byte). This option implies <literal>-recursive</literal>.
+</para></listitem>
+</varlistentry>
+<varlistentry>
+<term>-qe</term>
+<listitem><para>Do not print most errors to stderr, just set the exit code
+</para></listitem>
+</varlistentry>
+<varlistentry>
+<term>-qo</term>
+<listitem><para>Do not print the regular output.
+</para></listitem>
+</varlistentry>
+
 </variablelist>
 </refsect2>
 
@@ -195,6 +217,11 @@ linker backend are printed.
   <listitem><para>Replaced by the package directory</para></listitem>
 </varlistentry>
 <varlistentry>
+<term>%m</term>
+  <listitem><para>Replaced by the path to the META file (new since findlib-1.6)
+</para></listitem>
+</varlistentry>
+<varlistentry>
 <term>%D</term>
   <listitem><para>Replaced by the package description</para></listitem>
 </varlistentry>
@@ -209,9 +236,20 @@ linker backend are printed.
 </para></listitem>
 </varlistentry>
 <varlistentry>
+<term>%+a</term>
+  <listitem><para>Like %a, but the filenames are converted to absolute
+  paths ("+" and "@" notations are resolved)
+</para></listitem>
+</varlistentry>
+<varlistentry>
 <term>%A</term>
   <listitem><para>Replaced by the list of archive filenames.</para></listitem>
 </varlistentry>
+<varlistentry>
+<term>%+A</term>
+  <listitem><para>Like %A, but the filenames are converted to absolute
+  paths ("+" and "@" notations are resolved)
+</para></listitem>
 <varlistentry>
 <term>%o</term>
   <listitem><para>Replaced by one linker option. If there is more than
@@ -253,10 +291,12 @@ ocamlfind ( ocamlc | ocamlcp | ocamlopt | ocamlmktop )
             -dontlink <replaceable>package-name-list</replaceable> |
 	    -syntax <replaceable>pred-name-list</replaceable> |
             -ppopt <replaceable>camlp4-arg</replaceable> |
+            -ppxopt <replaceable>package</replaceable>,<replaceable>arg</replaceable> |
             -dllpath-pkg <replaceable>package-name-list</replaceable> |
             -dllpath-all |
 	    -passopt <replaceable>arg</replaceable> |
             -passrest <replaceable>arg...</replaceable> |
+            -only-show |
 	    <replaceable>standard-option</replaceable> ]
           <replaceable>file</replaceable> ...
 </programlisting>
@@ -383,6 +423,12 @@ explained below.
   passed directly to the underlying compiler. This is needed to
   specify undocumented compiler options.
 </para></listitem>
+<varlistentry>
+<term>-only-show</term>
+  <listitem><para>Only prints the constructed command (ocamlc/ocamlopt) to
+  stdout, but does not execute the command. (This is for the unlikely event
+  that you need a wrapper around ocamlfind.)
+</para></listitem>
 </varlistentry>
 
 <varlistentry>
@@ -448,6 +494,13 @@ The options relevant for the preprocessor are the following:
 <varlistentry>
   <term>-ppopt <replaceable>camlp4-arg</replaceable></term>
   <listitem><para>This argument is passed to the camlp4 call.
+  </para></listitem>
+</varlistentry>
+<varlistentry>
+  <term>-ppxopt <replaceable>package</replaceable>,<replaceable>arg</replaceable></term>
+  <listitem><para>Add <replaceable>arg</replaceable> to the ppx
+      preprocessor invocation specified via the "ppx" property in
+      the META file of <replaceable>package</replaceable>.
   </para></listitem>
 </varlistentry>
 </variablelist>
@@ -1165,6 +1218,69 @@ outputs the package descriptions, too.
 </refsect2>
 </refsect1>
 
+<!-- ********************************************************************** -->
+
+<refsect1>
+<title><anchor id="ocamlfind.printppx">
+  THE "printppx" SUBCOMMAND
+</title>
+
+<refsect2>
+<title>Synopsis</title>
+<programlisting>
+ocamlfind printppx
+          [ -predicates <replaceable>pred-name-list</replaceable> ]
+          [ -ppxopt <replaceable>package</replaceable>,<replaceable>arg</replaceable> ]
+          <replaceable>package</replaceable> ...
+</programlisting>
+</refsect2>
+
+<refsect2>
+<title>Description</title>
+<para>
+This command prints the ppx preprocessor options as they would
+occur in an OCaml compiler invocation for the packages listed in
+the command. The output includes one "-ppx" option for each
+preprocessor. The possible options have the same meaning as for
+"ocamlfind ocamlc". The option "-predicates" adds assumed
+predicates and
+"-ppxopt <replaceable>package</replaceable>,<replaceable>arg</replaceable>"
+adds "<replaceable>arg</replaceable>" to the ppx invocation of
+package <replaceable>package</replaceable>.
+</para>
+
+<para>
+The output of "ocamlfind printppx" will contain quotes
+"<literal>"</literal>" for ppx commands that contain
+space-separated arguments. In this case <literal>$(ocamlfind
+printppx ...)</literal> won't work as naively expected, because
+many shells (including bash and dash) perform field splitting on
+the result of command substitutions without honoring quotes.
+</para>
+</refsect2>
+</refsect1>
+
+<!-- ********************************************************************** -->
+
+<refsect1>
+<title><anchor id="ocamlfind.lint">
+  THE "lint" SUBCOMMAND
+</title>
+
+<refsect2>
+<title>Synopsis</title>
+<programlisting>
+ocamlfind lint <replaceable>file</replaceable>
+</programlisting>
+</refsect2>
+
+<refsect2>
+<title>Description</title>
+<para>
+Checks the META file, and reports possible problems.
+</para>
+</refsect2>
+</refsect1>
 
 <!-- ********************************************************************** -->
 
@@ -1176,7 +1292,7 @@ outputs the package descriptions, too.
 <refsect2>
 <title>Synopsis</title>
 <programlisting>
-ocamlfind printconf [ conf | path | destdir | metadir | stdlib | ldconf ]
+ocamlfind printconf [ conf | path | destdir | metadir | metapath | stdlib | ldconf ]
 </programlisting>
 </refsect2>
 
@@ -1211,6 +1327,13 @@ explaining texts:
   <term><literal>metadir</literal></term>
   <listitem><para>Prints the location where META files are installed and
   removed (if the alternative layout is used).</para></listitem>
+</varlistentry>
+<varlistentry>
+  <term><literal>metapath</literal></term>
+  <listitem><para>Prints the path where the META file is installed for
+a fictive package. The name of the package is marked with '%s' in the
+path. For instance, this command could output "/some/path/%s/META" or
+"/some/path/META.%s", depending on the layout.</para></listitem>
 </varlistentry>
 <varlistentry>
   <term><literal>stdlib</literal></term>

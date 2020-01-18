@@ -10,20 +10,22 @@ TOP=.
 .PHONY: all opt install uninstall clean
 
 all:
-	for p in $(PARTS); do ( cd src/$$p; $(MAKE) all ); done
+	for p in $(PARTS); do ( cd src/$$p; $(MAKE) all ) || exit; done
 	$(MAKE) all-config
 
 opt:
-	for p in $(PARTS); do ( cd src/$$p; $(MAKE) opt ); done
+	for p in $(PARTS); do ( cd src/$$p; $(MAKE) opt ) || exit; done
 
 install:
 	mkdir -p "$(prefix)$(OCAMLFIND_BIN)"
 	mkdir -p "$(prefix)$(OCAMLFIND_MAN)"
+	$(MAKE) install-config
 	for p in $(PARTS); do ( cd src/$$p; $(MAKE) install ); done
 	$(MAKE) install-meta
-	cd src/findlib; $(MAKE) install-num-top
-	$(MAKE) install-config
-	cp tools/safe_camlp4 "$(prefix)$(OCAMLFIND_BIN)"
+	test -z "$(NUMTOP)" || { cd src/findlib; $(MAKE) install-num-top; }
+	if [ $(INSTALL_CAMLP4) -eq 1 ]; then \
+		cp tools/safe_camlp4 "$(prefix)$(OCAMLFIND_BIN)"; \
+	fi
 	$(MAKE) install-doc
 
 uninstall:
@@ -49,43 +51,46 @@ README: doc/README
 .PHONY: all-config
 all-config: findlib.conf
 
-findlib.conf: findlib.conf.in 
+findlib.conf: findlib.conf.in
 	USE_CYGPATH="$(USE_CYGPATH)"; \
 	export USE_CYGPATH; \
 	cat findlib.conf.in | \
-		tools/patch '@SITELIB@' '$(OCAML_SITELIB)' >findlib.conf
-	if ocamlc.opt >/dev/null 2>&1; then \
+	    $(SH) tools/patch '@SITELIB@' '$(OCAML_SITELIB)' >findlib.conf
+	if ./tools/cmd_from_same_dir ocamlc; then \
 		echo 'ocamlc="ocamlc.opt"' >>findlib.conf; \
 	fi
-	if ocamlopt.opt >/dev/null 2>&1; then \
+	if ./tools/cmd_from_same_dir ocamlopt; then \
 		echo 'ocamlopt="ocamlopt.opt"' >>findlib.conf; \
 	fi
-	if ocamldep.opt >/dev/null 2>&1; then \
+	if ./tools/cmd_from_same_dir ocamldep; then \
 		echo 'ocamldep="ocamldep.opt"' >>findlib.conf; \
+	fi
+	if ./tools/cmd_from_same_dir ocamldoc; then \
+		echo 'ocamldoc="ocamldoc.opt"' >>findlib.conf; \
 	fi
 
 .PHONY: install-doc
 install-doc:
-	mkdir -p $(prefix)$(OCAMLFIND_MAN)/man1 $(prefix)$(OCAMLFIND_MAN)/man3 $(prefix)$(OCAMLFIND_MAN)/man5
-	-cp doc/ref-man/ocamlfind.1 $(prefix)$(OCAMLFIND_MAN)/man1
-	-cp doc/ref-man/META.5 doc/ref-man/site-lib.5 doc/ref-man/findlib.conf.5 $(prefix)$(OCAMLFIND_MAN)/man5
+	mkdir -p "$(prefix)$(OCAMLFIND_MAN)/man1" "$(prefix)$(OCAMLFIND_MAN)/man3" "$(prefix)$(OCAMLFIND_MAN)/man5"
+	-cp doc/ref-man/ocamlfind.1 "$(prefix)$(OCAMLFIND_MAN)/man1"
+	-cp doc/ref-man/META.5 doc/ref-man/site-lib.5 doc/ref-man/findlib.conf.5 "$(prefix)$(OCAMLFIND_MAN)/man5"
 
 .PHONY: uninstall-doc
 uninstall-doc:
-	rm -f $(prefix)$(OCAMLFIND_MAN)/man1/ocamlfind.1
-	rm -f $(prefix)$(OCAMLFIND_MAN)/man3/Findlib.3
-	rm -f $(prefix)$(OCAMLFIND_MAN)/man3/Topfind.3
-	rm -f $(prefix)$(OCAMLFIND_MAN)/man5/META.5
-	rm -f $(prefix)$(OCAMLFIND_MAN)/man5/site-lib.5
+	rm -f "$(prefix)$(OCAMLFIND_MAN)/man1/ocamlfind.1"
+	rm -f "$(prefix)$(OCAMLFIND_MAN)/man3/Findlib.3"
+	rm -f "$(prefix)$(OCAMLFIND_MAN)/man3/Topfind.3"
+	rm -f "$(prefix)$(OCAMLFIND_MAN)/man5/META.5"
+	rm -f "$(prefix)$(OCAMLFIND_MAN)/man5/site-lib.5"
 
 
 .PHONY: install-meta
 install-meta:
-	for x in `ls site-lib-src`; do if [ "$$x" != "CVS" -a -f "site-lib-src/$$x/META" ]; then mkdir -p "$(prefix)$(OCAML_SITELIB)/$$x"; cp site-lib-src/$$x/META "$(prefix)$(OCAML_SITELIB)/$$x"; fi; done
+	for x in `ls site-lib-src`; do if [ -f "site-lib-src/$$x/META" ]; then mkdir -p "$(prefix)$(OCAML_SITELIB)/$$x"; cp site-lib-src/$$x/META "$(prefix)$(OCAML_SITELIB)/$$x"; fi; done
 
 .PHONY: uninstall-meta
 uninstall-meta:
-	for x in `ls site-lib-src`; do if [ "$$x" != "CVS" ]; then rm -rf "$(prefix)$(OCAML_SITELIB)/$$x"; fi; done
+	for x in `ls site-lib-src`; do if [ -f "site-lib-src/$$x/META" ]; then rm -rf "$(prefix)$(OCAML_SITELIB)/$$x"; fi; done
 
 .PHONY: install-config
 install-config:
@@ -123,7 +128,7 @@ interface-lists:
 
 package-macosx: all opt
 	mkdir -p package-macosx/root
-	export prefix=`pwd`/package-macosx/root && make install 
+	export prefix=`pwd`/package-macosx/root && make install
 	export VERSION=1.1.2 && tools/make-package-macosx
 
 clean-macosx:
