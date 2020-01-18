@@ -6,7 +6,7 @@
 
 Name:           ocaml-findlib
 Version:        1.3.3
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Objective CAML package manager and build helper
 
 Group:          Development/Libraries
@@ -127,6 +127,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Aug 08 2014 Richard W.M. Jones <rjones@redhat.com> - 1.3.3-6
+- Resolves: rhbz#1125627
+
 * Fri Dec 27 2013 Daniel Mach <dmach@redhat.com> - 1.3.3-5
 - Mass rebuild 2013-12-27
 
