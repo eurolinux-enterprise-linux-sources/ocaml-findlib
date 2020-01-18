@@ -6,7 +6,7 @@
 
 Name:           ocaml-findlib
 Version:        1.3.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Objective CAML package manager and build helper
 
 Group:          Development/Libraries
@@ -127,6 +127,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Dec 27 2013 Daniel Mach <dmach@redhat.com> - 1.3.3-5
+- Mass rebuild 2013-12-27
+
 * Thu Feb 14 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.3.3-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 
@@ -206,7 +209,7 @@ rm -rf $RPM_BUILD_ROOT
 * Wed Nov 26 2008 Richard W.M. Jones <rjones@redhat.com> - 1.2.3-3
 - Rebuild for OCaml 3.11.0+rc1.
 
-* Fri Nov 20 2008 Richard W.M. Jones <rjones@redhat.com> - 1.2.3-2
+* Fri Nov 21 2008 Richard W.M. Jones <rjones@redhat.com> - 1.2.3-2
 - Force rebuild.
 
 * Thu Nov 20 2008 Richard W.M. Jones <rjones@redhat.com> - 1.2.3-1
