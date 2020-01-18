@@ -6,7 +6,7 @@
 
 Name:           ocaml-findlib
 Version:        1.3.3
-Release:        4%{?dist}
+Release:        7%{?dist}
 Summary:        Objective CAML package manager and build helper
 
 Group:          Development/Libraries
@@ -15,6 +15,11 @@ URL:            http://projects.camlcity.org/projects/findlib.html
 Source0:        http://download.camlcity.org/download/findlib-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 ExcludeArch:    sparc64 s390 s390x
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=1403897
+# https://gitlab.camlcity.org/gerd/lib-findlib/commit/d5838369130057d207a8140c426d0394989951f2
+# Fix a performance problem when ocamlfind links long command lines.
+Patch1:         0001-fix-performance-bug-J-r-me-Vouillon.patch
 
 BuildRequires:  ocaml >= 4.00.1
 BuildRequires:  ocaml-camlp4-devel
@@ -45,6 +50,7 @@ developing applications that use %{name}.
 
 %prep
 %setup -q -n findlib-%{version}
+%patch1 -p1
 
 
 %build
@@ -127,6 +133,16 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue Feb 07 2017 Richard W.M. Jones <rjones@redhat.com> - 1.3.3-7
+- Fix a performance problem when ocamlfind links long command lines.
+  resolves: rhbz#1403897
+
+* Fri Aug 08 2014 Richard W.M. Jones <rjones@redhat.com> - 1.3.3-6
+- Resolves: rhbz#1125627
+
+* Fri Dec 27 2013 Daniel Mach <dmach@redhat.com> - 1.3.3-5
+- Mass rebuild 2013-12-27
+
 * Thu Feb 14 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.3.3-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 
@@ -206,7 +222,7 @@ rm -rf $RPM_BUILD_ROOT
 * Wed Nov 26 2008 Richard W.M. Jones <rjones@redhat.com> - 1.2.3-3
 - Rebuild for OCaml 3.11.0+rc1.
 
-* Fri Nov 20 2008 Richard W.M. Jones <rjones@redhat.com> - 1.2.3-2
+* Fri Nov 21 2008 Richard W.M. Jones <rjones@redhat.com> - 1.2.3-2
 - Force rebuild.
 
 * Thu Nov 20 2008 Richard W.M. Jones <rjones@redhat.com> - 1.2.3-1
